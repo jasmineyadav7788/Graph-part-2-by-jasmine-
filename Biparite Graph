@@ -1,0 +1,66 @@
+import java.util.*;
+
+public class BipartiteGraph {
+    private int[][] adjacencyMatrix;
+    private int numVertices;
+    
+    public BipartiteGraph(int numVertices) {
+        this.numVertices = numVertices;
+        adjacencyMatrix = new int[numVertices][numVertices];
+    }
+    
+    public void addEdge(int source, int destination) {
+        adjacencyMatrix[source][destination] = 1;
+        adjacencyMatrix[destination][source] = 1;
+    }
+    
+    public boolean isBipartite() {
+        int[] colors = new int[numVertices];
+        Arrays.fill(colors, -1);
+        
+        for (int i = 0; i < numVertices; i++) {
+            if (colors[i] == -1) {
+                if (!isBipartiteUtil(i, colors)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    private boolean isBipartiteUtil(int vertex, int[] colors) {
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(vertex);
+        colors[vertex] = 0;
+        
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            
+            for (int i = 0; i < numVertices; i++) {
+                if (adjacencyMatrix[current][i] == 1 && colors[i] == -1) {
+                    colors[i] = 1 - colors[current];
+                    queue.add(i);
+                } else if (adjacencyMatrix[current][i] == 1 && colors[i] == colors[current]) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    public static void main(String[] args) {
+        BipartiteGraph graph = new BipartiteGraph(4);
+        graph.addEdge(0, 1);
+        graph.addEdge(1, 2);
+        graph.addEdge(2, 3);
+        graph.addEdge(3, 0);
+        
+        if (graph.isBipartite()) {
+            System.out.println("The graph is bipartite.");
+        } else {
+            System.out.println("The graph is not bipartite.");
+        }
+    }
+}
